@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(project(":domain"))
 

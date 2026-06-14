@@ -21,6 +21,7 @@ testingMockitoMain = "5.20.0"
 testingMockitoKotlin = "6.1.0"
 kotlinTest = "4.2.0"
 androidXArch = "2.2.0"
+kotlinx-collections-immutable = "0.4.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -52,6 +53,7 @@ testing-mockito-core = { group = "org.mockito", name = "mockito-core", version.r
 testing-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "testingMockitoKotlin" }
 kotlin-test-assertions = { group = "io.kotest", name = "kotest-assertions-core-jvm", version.ref = "kotlinTest" }
 androidx-arch-core-test = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidXArch" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

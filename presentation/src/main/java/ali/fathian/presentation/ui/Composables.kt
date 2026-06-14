@@ -41,9 +41,9 @@ fun LaunchList(
     onBookmarkClicked: (UiModel) -> Unit
 ) {
     var selectedBottomBarIndex by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
-    val bottomBarItems = listOf("Launches", "Bookmarks")
+    val bottomBarItems = remember { listOf("Launches", "Bookmarks") }
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
@@ -113,7 +113,7 @@ fun Bookmarks(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(all = 8.dp)
     ) {
-        items(bookmarks ?: emptyList()) { uiModel ->
+        items(bookmarks ?: emptyList(), key = { it.id }) { uiModel ->
             LaunchItem(
                 uiModel = uiModel,
                 onItemClick = onItemClick,
@@ -132,9 +132,9 @@ private fun Home(
     onItemClick: (UiModel, Origin) -> Unit,
     onBookmarkClicked: (UiModel) -> Unit
 ) {
-    val tabItems = listOf("All", "Upcoming", "Past")
+    val tabItems = remember { listOf("All", "Upcoming", "Past") }
     var selectedTabIndex by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
     Column(
         modifier = Modifier
@@ -199,7 +199,7 @@ fun LaunchesUi(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(all = 8.dp)
     ) {
-        items(launches) { uiModel ->
+        items(launches, key = { it.id }) { uiModel ->
             LaunchItem(
                 uiModel = uiModel,
                 onItemClick = onItemClick,
@@ -216,7 +216,7 @@ fun ErrorMessageUi(message: String, onRetryClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = message)
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { onRetryClick() }) {
+            Button(onClick = onRetryClick) {
                 Text(text = "Retry")
             }
         }

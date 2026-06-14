@@ -21,13 +21,35 @@ class DefaultLaunchRepository @Inject constructor(
         return try {
             val response = apiService.getAllLaunches()
             if (response.isSuccessful) {
-                val launches = response.body()?.map { it.toDomainLaunchModel() }
-                Resource.Success(launches ?: emptyList())
+                val launches = response.body()?.map { it.toDomainLaunchModel() }.orEmpty()
+                Resource.Success(launches)
             } else {
-                Resource.Error(message = response.message() ?: "Unknown Error")
+                // Map HTTP error codes to meaningful messages
+                val message = when (response.code()) {
+                    400 -> "Bad Request — something went wrong in the request."
+                    401 -> "Unauthorized — please check your credentials."
+                    403 -> "Forbidden — access denied."
+                    404 -> "Launch data not found."
+                    500 -> "Server Error — please try again later."
+                    else -> response.message().ifEmpty { "Unexpected response (${response.code()})" }
+                }
+                Resource.Error(message)
             }
+        } catch (e: retrofit2.HttpException) {
+            val message = when (e.code()) {
+                404 -> "Launch data not found."
+                500 -> "Server unreachable — please try again later."
+                else -> "HTTP error (${e.code()}) — ${e.message()}"
+            }
+            Resource.Error(message)
+        } catch (e: java.net.UnknownHostException) {
+            Resource.Error("No internet connection — please check your network.")
+        } catch (e: java.net.SocketTimeoutException) {
+            Resource.Error("Request timed out — try again later.")
+        } catch (e: com.google.gson.JsonParseException) {
+            Resource.Error("Failed to parse launch data — data format may be invalid.")
         } catch (e: Exception) {
-            Resource.Error(message = "Check your internet connection")
+            Resource.Error("Unexpected error occurred: ${e.localizedMessage ?: "Unknown"}")
         }
     }
 
