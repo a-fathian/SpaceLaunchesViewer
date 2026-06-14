@@ -73,7 +73,7 @@ class DefaultLaunchRepositoryTest : BaseTest() {
 
         // Assert
         Assert.assertTrue(result is Resource.Error)
-        Assert.assertEquals(errorMessage, (result as Resource.Error).message)
+        Assert.assertEquals("Unexpected error occurred: $errorMessage", (result as Resource.Error).message)
         Mockito.verify(apiService, times(1)).getAllLaunches()
     }
 
