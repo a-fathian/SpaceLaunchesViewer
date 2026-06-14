@@ -12,6 +12,7 @@ import ali.fathian.presentation.model.mapper.toUiModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -53,11 +54,11 @@ class LaunchesViewModel @Inject constructor(
                 launches.data?.let {
                     _uiState.emit(
                         Launches(
-                            allLaunches = it.map { item -> item.toUiModel() },
+                            allLaunches = it.map { item -> item.toUiModel() }.toImmutableList(),
                             upcomingLaunches = it.map { item -> item.toUiModel() }
-                                .filter { item -> item.upcoming },
+                                .filter { item -> item.upcoming }.toImmutableList(),
                             pastLaunches = it.map { item -> item.toUiModel() }
-                                .filter { item -> !item.upcoming },
+                                .filter { item -> !item.upcoming }.toImmutableList(),
                             errorMessage = "",
                             loading = false
                         )
@@ -83,9 +84,9 @@ class LaunchesViewModel @Inject constructor(
             }
             _uiState.emit(
                 uiState.value.copy(
-                    allLaunches = list,
-                    upcomingLaunches = list.filter { it.upcoming },
-                    pastLaunches = list.filter { !it.upcoming },
+                    allLaunches = list.toImmutableList(),
+                    upcomingLaunches = list.filter { it.upcoming }.toImmutableList(),
+                    pastLaunches = list.filter { !it.upcoming }.toImmutableList(),
                 )
             )
         }
@@ -118,7 +119,7 @@ class LaunchesViewModel @Inject constructor(
                 // Leave all other items unmodified
                 else -> item
             }
-        }
+        }.toImmutableList()
 
         // Update the state with the new list
         when (origin) {
