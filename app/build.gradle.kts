@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.com.android.application)
-    alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -10,12 +9,12 @@ plugins {
 
 android {
     namespace = "ali.fathian.space.launches"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "ali.fathian.space.launches"
         minSdk = 23
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
