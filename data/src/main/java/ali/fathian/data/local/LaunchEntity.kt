@@ -5,6 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "launches")
 data class LaunchEntity(
+    @PrimaryKey(autoGenerate = false)
+    val id: String = "",
     val image: String? = null,
     val name: String? = null,
     val date: String? = null,
@@ -13,6 +15,4 @@ data class LaunchEntity(
     val upcoming: Boolean = false,
     val bookmarked: Boolean = false,
     val success: Boolean = false,
-    @PrimaryKey(autoGenerate = false)
-    val id: String = ""
 )
