@@ -1,5 +1,6 @@
 package ali.fathian.presentation.launch
 
+import ali.fathian.domain.common.NetworkError
 import ali.fathian.domain.common.Resource
 import ali.fathian.domain.use_cases.BookmarksUseCase
 import ali.fathian.domain.use_cases.GetAllLaunchesUseCase
@@ -49,27 +50,43 @@ class LaunchesViewModel @Inject constructor(
     fun fetchLaunches() {
         viewModelScope.launch(dispatcher) {
             _uiState.emit(uiState.value.copy(loading = true))
-            val launches = launchUseCase()
-            if (launches is Resource.Success) {
-                launches.data?.let {
+            when (val result = launchUseCase()) {
+                is Resource.Success -> {
+                    val launches = result.data.map { it.toUiModel() }
                     _uiState.emit(
                         Launches(
-                            allLaunches = it.map { item -> item.toUiModel() }.toImmutableList(),
-                            upcomingLaunches = it.map { item -> item.toUiModel() }
-                                .filter { item -> item.upcoming }.toImmutableList(),
-                            pastLaunches = it.map { item -> item.toUiModel() }
-                                .filter { item -> !item.upcoming }.toImmutableList(),
+                            allLaunches = launches.toImmutableList(),
+                            upcomingLaunches = launches.filter { it.upcoming }.toImmutableList(),
+                            pastLaunches = launches.filter { !it.upcoming }.toImmutableList(),
                             errorMessage = "",
                             loading = false
                         )
                     )
                 }
-            } else {
-                _uiState.emit(
-                    uiState.value.copy(errorMessage = launches.message ?: "Unknown Error", loading = false)
-                )
+                is Resource.Error -> {
+                    _uiState.emit(
+                        uiState.value.copy(
+                            errorMessage = result.error.toUserMessage(),
+                            loading = false
+                        )
+                    )
+                }
             }
         }
+    }
+
+    private fun NetworkError.toUserMessage(): String = when (this) {
+        is NetworkError.Http -> when (code) {
+            400 -> "Bad request — something went wrong."
+            401 -> "Unauthorized — check your credentials."
+            403 -> "Access denied."
+            404 -> "Launch data not found."
+            500 -> "Server error — try again later."
+            else -> "Unexpected error (code $code)"
+        }
+        NetworkError.NoConnection -> "No internet connection — check your network."
+        NetworkError.Timeout -> "Request timed out — try again later."
+        is NetworkError.Unknown -> "Unexpected error: ${throwable.localizedMessage ?: "Unknown"}"
     }
 
     private fun syncWithDatabase(allLaunches: List<UiModel>, bookmarks: List<UiModel>) {
