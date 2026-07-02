@@ -1,6 +1,7 @@
 package ali.fathian.domain.use_cases
 
 import ali.fathian.domain.BaseTest
+import ali.fathian.domain.common.NetworkError
 import ali.fathian.domain.common.Resource
 import ali.fathian.domain.model.DomainLaunchModel
 import ali.fathian.domain.repository.LaunchRepository
@@ -24,16 +25,17 @@ class GetAllLaunchesUseCaseTest : BaseTest() {
     fun `invoke returns error resource when repository fetch fails`() = runTest {
         // Arrange
         val useCase = GetAllLaunchesUseCase(launchRepository)
-        val errorMessage = "Error fetching launches"
+        val networkError = NetworkError.NoConnection
         launchRepository.stub {
-            onBlocking { getAllLaunches() } doReturn Resource.Error(errorMessage)
+            onBlocking { getAllLaunches() } doReturn Resource.Error(networkError)
         }
+
         // Act
         val result = useCase()
 
         // Assert
         assertTrue(result is Resource.Error)
-        assertEquals(errorMessage, (result as Resource.Error).message)
+        assertEquals(networkError, (result as Resource.Error).error)
         verify(launchRepository).getAllLaunches()
     }
 

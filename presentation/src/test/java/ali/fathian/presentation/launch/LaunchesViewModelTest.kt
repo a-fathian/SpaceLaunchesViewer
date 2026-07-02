@@ -1,5 +1,6 @@
 package ali.fathian.presentation.launch
 
+import ali.fathian.domain.common.NetworkError
 import ali.fathian.domain.common.Resource
 import ali.fathian.domain.model.DomainLaunchModel
 import ali.fathian.domain.use_cases.BookmarksUseCase
@@ -36,36 +37,34 @@ class LaunchesViewModelTest : BaseTest() {
     fun `fetchLaunches success updates uiState with launches`() = runTest {
         val expectedLaunches = getLaunchesList()
         getAllLaunchesUseCase.stub {
-            onBlocking { invoke() } doReturn expectedLaunches
+            onBlocking { invoke() } doReturn Resource.Success(expectedLaunches)
         }
         viewModel.fetchLaunches()
         viewModel.uiState.test {
             val launches = awaitItem()
             assertTrue(launches.errorMessage.isEmpty())
             assertEquals(1, launches.allLaunches.size)
-            assertEquals(expectedLaunches.data?.get(0)?.name, launches.allLaunches[0].name)
+            assertEquals(expectedLaunches[0].name, launches.allLaunches[0].name)
         }
     }
 
     @Test
     fun `fetchLaunches error updates uiState with error message`() = runTest {
         getAllLaunchesUseCase.stub {
-            onBlocking { invoke() } doReturn Resource.Error("Error")
+            onBlocking { invoke() } doReturn Resource.Error(NetworkError.Timeout)
         }
         viewModel.fetchLaunches()
         viewModel.uiState.test {
             val launches = awaitItem()
             assertTrue(launches.errorMessage.isNotEmpty())
-            assertEquals("Error", launches.errorMessage)
+            assertEquals("Request timed out — try again later.", launches.errorMessage)
         }
     }
 
-    private fun getLaunchesList(): Resource<List<DomainLaunchModel>> {
-        return Resource.Success(
-            listOf(
-                DomainLaunchModel(
-                    name = "Falcon"
-                )
+    private fun getLaunchesList(): List<DomainLaunchModel> {
+        return listOf(
+            DomainLaunchModel(
+                name = "Falcon"
             )
         )
     }

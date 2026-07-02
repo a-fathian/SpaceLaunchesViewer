@@ -5,15 +5,16 @@ import ali.fathian.data.local.LaunchDao
 import ali.fathian.data.remote.api.ApiService
 import ali.fathian.data.remote.dto.Launch
 import ali.fathian.data.remote.dto.mapper.toDomainLaunchModel
+import ali.fathian.domain.common.NetworkError
 import ali.fathian.domain.common.Resource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.exceptions.base.MockitoException
 import org.mockito.kotlin.*
 import retrofit2.Response
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultLaunchRepositoryTest : BaseTest() {
@@ -63,17 +64,18 @@ class DefaultLaunchRepositoryTest : BaseTest() {
     @Test
     fun `getAllLaunches returns error resource when response is unsuccessful`() = runTest {
         // Arrange (preparing the scenario)
-        val errorMessage = "Check your internet connection"
-
         apiService.stub {
-            onBlocking { getAllLaunches() } doThrow MockitoException(errorMessage)
+            onBlocking { getAllLaunches() } doThrow IOException("Check your internet connection")
         }
+
         // Act
         val result = DefaultLaunchRepository(apiService, launchDao).getAllLaunches()
 
         // Assert
         Assert.assertTrue(result is Resource.Error)
-        Assert.assertEquals("Unexpected error occurred: $errorMessage", (result as Resource.Error).message)
+        val error = (result as Resource.Error).error
+        Assert.assertTrue(error is NetworkError.Unknown)
+        Assert.assertEquals("Check your internet connection", (error as NetworkError.Unknown).throwable.message)
         Mockito.verify(apiService, times(1)).getAllLaunches()
     }
 
