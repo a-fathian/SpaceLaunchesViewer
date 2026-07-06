@@ -25,7 +25,7 @@ class LaunchesViewModelTest : BaseTest() {
 
     private val getAllLaunchesUseCase = mock<GetAllLaunchesUseCase>()
     private val bookmarksUseCase = mock<BookmarksUseCase>().stub {
-        onBlocking { getLocalLaunches() } doReturn flowOf(emptyList())
+        on { getLocalLaunches() } doReturn flowOf(emptyList())
     }
 
     @Before
@@ -37,7 +37,7 @@ class LaunchesViewModelTest : BaseTest() {
     fun `fetchLaunches success updates uiState with launches`() = runTest {
         val expectedLaunches = getLaunchesList()
         getAllLaunchesUseCase.stub {
-            onBlocking { invoke() } doReturn Resource.Success(expectedLaunches)
+            on { invoke() } doReturn Resource.Success(expectedLaunches)
         }
         viewModel.fetchLaunches()
         viewModel.uiState.test {
@@ -51,7 +51,7 @@ class LaunchesViewModelTest : BaseTest() {
     @Test
     fun `fetchLaunches error updates uiState with error message`() = runTest {
         getAllLaunchesUseCase.stub {
-            onBlocking { invoke() } doReturn Resource.Error(NetworkError.Timeout)
+            on { invoke() } doReturn Resource.Error(NetworkError.Timeout)
         }
         viewModel.fetchLaunches()
         viewModel.uiState.test {

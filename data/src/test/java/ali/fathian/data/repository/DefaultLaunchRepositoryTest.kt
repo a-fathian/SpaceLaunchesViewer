@@ -28,7 +28,7 @@ class DefaultLaunchRepositoryTest : BaseTest() {
         val launchResponse = getSuccessResponse()
         val apiResponse = Response.success(launchResponse)
         apiService.stub {
-            onBlocking { getAllLaunches() } doReturn apiResponse
+            on { getAllLaunches() } doReturn apiResponse
         }
         // Act
         val result = DefaultLaunchRepository(apiService, launchDao).getAllLaunches()
@@ -49,14 +49,14 @@ class DefaultLaunchRepositoryTest : BaseTest() {
             val apiResponse = Response.success(null as List<Launch>?)
 
             apiService.stub {
-                onBlocking { getAllLaunches() } doReturn apiResponse
+                on { getAllLaunches() } doReturn apiResponse
             }
             // Act
             val result = DefaultLaunchRepository(apiService, launchDao).getAllLaunches()
 
             // Assert
             Assert.assertTrue(result is Resource.Success)
-            Assert.assertTrue((result as Resource.Success).data?.isEmpty() == true)
+            Assert.assertTrue((result as Resource.Success).data.isEmpty())
 
             Mockito.verify(apiService, times(1)).getAllLaunches()
         }
@@ -65,7 +65,7 @@ class DefaultLaunchRepositoryTest : BaseTest() {
     fun `getAllLaunches returns error resource when response is unsuccessful`() = runTest {
         // Arrange (preparing the scenario)
         apiService.stub {
-            onBlocking { getAllLaunches() } doThrow IOException("Check your internet connection")
+            on { getAllLaunches() } doThrow IOException("Check your internet connection")
         }
 
         // Act

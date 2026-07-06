@@ -75,7 +75,6 @@ dependencies {
     implementation(project(":domain"))
 
     testImplementation(libs.junit)
-
     testImplementation(libs.turbine)
     testImplementation(libs.kotlin.test.assertions)
     testImplementation(libs.testing.mockito.core)

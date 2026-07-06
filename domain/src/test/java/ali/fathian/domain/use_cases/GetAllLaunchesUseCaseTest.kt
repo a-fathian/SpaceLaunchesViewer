@@ -27,7 +27,7 @@ class GetAllLaunchesUseCaseTest : BaseTest() {
         val useCase = GetAllLaunchesUseCase(launchRepository)
         val networkError = NetworkError.NoConnection
         launchRepository.stub {
-            onBlocking { getAllLaunches() } doReturn Resource.Error(networkError)
+            on { getAllLaunches() } doReturn Resource.Error(networkError)
         }
 
         // Act
@@ -45,7 +45,7 @@ class GetAllLaunchesUseCaseTest : BaseTest() {
         val useCase = GetAllLaunchesUseCase(launchRepository)
         val mockLaunchesList = getSuccessResult()
         launchRepository.stub {
-            onBlocking { getAllLaunches() } doReturn Resource.Success(mockLaunchesList)
+            on { getAllLaunches() } doReturn Resource.Success(mockLaunchesList)
         }
 
         // Act
